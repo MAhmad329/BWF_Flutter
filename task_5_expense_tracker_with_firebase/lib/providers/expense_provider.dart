@@ -16,7 +16,6 @@ class ExpenseServiceProvider with ChangeNotifier {
   }
 
   List<Expense> get expenses {
-    // Sort the expenses based on _isAscending
     _expenses.sort((a, b) => _isAscending
         ? a.createdAt.compareTo(b.createdAt)
         : b.createdAt.compareTo(a.createdAt));

@@ -154,7 +154,10 @@ class _ExpenseDialogState extends State<ExpenseDialog> {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryGreen,
           ),
-          child: Text(widget.expense == null ? 'Add' : 'Update'),
+          child: Text(
+            widget.expense == null ? 'Add' : 'Update',
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
       ],
     );

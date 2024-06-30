@@ -1,6 +1,7 @@
 import 'package:expense_tracker/providers/auth_provider.dart';
 import 'package:expense_tracker/providers/email_verification_provider.dart';
 import 'package:expense_tracker/providers/expense_provider.dart';
+import 'package:expense_tracker/providers/home_provider.dart';
 import 'package:expense_tracker/routes/app_routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AuthServiceProvider()),
         ChangeNotifierProvider(create: (_) => ExpenseServiceProvider()),
         ChangeNotifierProvider(create: (_) => EmailVerificationProvider()),
+        ChangeNotifierProvider(create: (_) => HomeProvider()),
       ],
       child: const MyApp(),
     ),

@@ -10,11 +10,6 @@ class ExpenseServiceProvider with ChangeNotifier {
   List<Expense> _expenses = [];
   bool _isAscending = true;
 
-  ExpenseServiceProvider() {
-    _user = FirebaseAuth.instance.currentUser;
-    _loadExpenses();
-  }
-
   List<Expense> get expenses {
     _expenses.sort((a, b) => _isAscending
         ? a.createdAt.compareTo(b.createdAt)
@@ -27,7 +22,8 @@ class ExpenseServiceProvider with ChangeNotifier {
   double get totalExpense => _expenses.fold(
       0, (sumOfExpenses, expense) => sumOfExpenses + expense.amount);
 
-  Future<void> _loadExpenses() async {
+  Future<void> loadExpenses() async {
+    _user = FirebaseAuth.instance.currentUser;
     if (_user != null) {
       CollectionReference expensesCollectionRef =
           _db.collection('users').doc(_user!.uid).collection('expenses');
@@ -39,8 +35,21 @@ class ExpenseServiceProvider with ChangeNotifier {
     }
   }
 
+  Future<void> fetchInitialExpenses() async {
+    _user = FirebaseAuth.instance.currentUser;
+    if (_user != null) {
+      CollectionReference expensesCollectionRef =
+          _db.collection('users').doc(_user!.uid).collection('expenses');
+      QuerySnapshot snapshot = await expensesCollectionRef.get();
+      _expenses =
+          snapshot.docs.map((doc) => Expense.fromFirestore(doc)).toList();
+      notifyListeners();
+    }
+  }
+
   Future<void> addExpense(
       String description, double amount, DateTime createdAt) async {
+    _user = FirebaseAuth.instance.currentUser;
     if (_user != null) {
       DocumentReference userDocRef = _db.collection('users').doc(_user!.uid);
       CollectionReference expensesCollectionRef =
@@ -55,7 +64,12 @@ class ExpenseServiceProvider with ChangeNotifier {
     }
   }
 
+  void emptyExpenses() {
+    _expenses = [];
+  }
+
   Future<void> deleteExpense(String id) async {
+    _user = FirebaseAuth.instance.currentUser;
     if (_user != null) {
       CollectionReference expensesCollectionRef =
           _db.collection('users').doc(_user!.uid).collection('expenses');
@@ -66,6 +80,7 @@ class ExpenseServiceProvider with ChangeNotifier {
 
   Future<void> updateExpense(
       String id, String description, double amount, DateTime createdAt) async {
+    _user = FirebaseAuth.instance.currentUser;
     if (_user != null) {
       CollectionReference expensesCollectionRef =
           _db.collection('users').doc(_user!.uid).collection('expenses');

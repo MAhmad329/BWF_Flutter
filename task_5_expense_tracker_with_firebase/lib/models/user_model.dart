@@ -1,7 +1,7 @@
 // models/user_model.dart
 class UserModel {
   final String uid;
-  final String userName;
+  String userName;
   final String email;
   final String pfp;
   final bool isVerified;

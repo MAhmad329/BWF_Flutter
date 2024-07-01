@@ -26,6 +26,9 @@ class AuthServiceProvider with ChangeNotifier {
 
   Future<String> uploadPicture(File image) async {
     try {
+      isLoading = true;
+      easyLoading();
+      notifyListeners();
       final imgId = DateTime.now().millisecondsSinceEpoch.toString();
       final storageRef = FirebaseStorage.instance.ref('Profile Pics');
       final imgRef = storageRef.child('path_$imgId');
@@ -45,6 +48,10 @@ class AuthServiceProvider with ChangeNotifier {
       }
 
       return ''; // Return a default value on failure
+    } finally {
+      isLoading = false;
+      EasyLoading.dismiss();
+      notifyListeners();
     }
   }
 
@@ -62,8 +69,6 @@ class AuthServiceProvider with ChangeNotifier {
     var snapshot =
         await _firestore.collection('users').doc(firebaseUser.uid).get();
     var userData = snapshot.data();
-
-    bool isPremium = userData?['isPremium'] ?? false;
     String? userName = userData?['userName'] ?? '';
     String? pfp = userData?['pfp'] ?? '';
 
@@ -206,6 +211,7 @@ class AuthServiceProvider with ChangeNotifier {
     isLoading = true;
     easyLoading();
     notifyListeners();
+    user?.userName = userName;
     if (user != null) {
       await _firestore.collection('users').doc(user!.uid).update({
         'userName': userName,

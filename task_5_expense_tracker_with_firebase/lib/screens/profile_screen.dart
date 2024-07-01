@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../widgets/custom_textfield.dart';
+import '../providers/home_provider.dart';
 import '../widgets/custom_button.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -24,6 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<AuthServiceProvider>(context);
+    final homeProvider = Provider.of<HomeProvider>(context);
     _userNameController.text = userProvider.user?.userName ?? '';
 
     Future<void> pickImage() async {
@@ -59,31 +61,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             children: [
               Center(
-                child: GestureDetector(
-                  onTap: () async {
-                    await pickImage();
-                    String url = await userProvider
-                        .uploadPicture(userProvider.pickedImage!);
-                    await userProvider.updateProfilePicture(url);
-                  },
-                  child: Consumer<AuthServiceProvider>(
-                    builder: (_, provider, child) {
-                      return provider.user?.pfp != ''
-                          ? CircleAvatar(
-                              backgroundColor: Colors.transparent,
-                              backgroundImage: NetworkImage(
-                                provider.user!.pfp,
-                              ),
-                              radius: 75.r,
-                            )
-                          : CircleAvatar(
-                              backgroundColor: Colors.transparent,
-                              backgroundImage: const AssetImage(
-                                'assets/defaultpic.jpg',
-                              ),
-                              radius: 75.r,
-                            );
+                child: CircleAvatar(
+                  backgroundImage: const AssetImage('assets/defaultpic.jpg'),
+                  radius: 75.r,
+                  child: GestureDetector(
+                    onTap: () async {
+                      await pickImage();
+                      String url = await userProvider
+                          .uploadPicture(userProvider.pickedImage!);
+                      await userProvider.updateProfilePicture(url);
+                      homeProvider.changeScreen(0);
                     },
+                    child: Consumer<AuthServiceProvider>(
+                      builder: (_, provider, child) {
+                        return provider.user?.pfp != ''
+                            ? CircleAvatar(
+                                backgroundColor: Colors.transparent,
+                                backgroundImage: NetworkImage(
+                                  provider.user!.pfp,
+                                ),
+                                radius: 75.r,
+                              )
+                            : CircleAvatar(
+                                backgroundColor: Colors.transparent,
+                                backgroundImage: const AssetImage(
+                                  'assets/defaultpic.jpg',
+                                ),
+                                radius: 75.r,
+                              );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -128,12 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPress: () async {
                   if (_formKey.currentState!.validate()) {
                     await userProvider.updateUserName(_userNameController.text);
-                    Future.delayed(
-                      Duration.zero,
-                      () {
-                        Navigator.pop(context);
-                      },
-                    );
+                    homeProvider.changeScreen(0);
                   }
                 },
               )
